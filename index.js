@@ -3,23 +3,40 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-// read todos from file and parse from string json to object
-const todos = JSON.parse(
-  fs.readFileSync("db.kassu", /* file encoding */ "utf8")
-);
+function save(user, data) {
+  fs.writeFileSync(`data/db.${user}`, JSON.stringify(data));
+}
+
+function load(user) {
+  try {
+    return JSON.parse(
+      fs.readFileSync(`data/db.${user}`, /* file encoding */ "utf8")
+    );
+  } catch (e) {
+    console.log(e);
+    save(user, []);
+    return [];
+  }
+}
 
 // returns the todo from memory
 app.get("/api/todos", (req, res) => {
-  res.json(todos);
+  const todos = load(req.headers.user);
+  res.json(
+    todos.filter((i) =>
+      req.query?.status ? req.query?.status == i.status : true
+    )
+  );
 });
 
 // adds the task from req.headers.todo into the todos
 app.post("/api/todo", (req, res) => {
+  const todos = load(req.headers.user);
   // push on the in memory todos list
   todos.push({ id: todos.length, status: "pending", task: req.headers.todo });
   try {
     // write/save the todos on to db.kassu file
-    fs.writeFileSync("db.kassu", JSON.stringify(todos));
+    save(req.headers.user, todos);
   } catch (e) {
     res.status(400).json({ message: e.message });
     return;
@@ -30,6 +47,7 @@ app.post("/api/todo", (req, res) => {
 
 // update a task status
 app.put("/api/todo/:id", (req, res) => {
+  const todos = load(req.headers.user);
   const id = parseInt(req.params.id);
   if (!["pending", "done"].includes(req.body?.status)) {
     res.status(402).json({ message: "invalid status" });
@@ -49,7 +67,7 @@ app.put("/api/todo/:id", (req, res) => {
   }
   try {
     // write/save the todos on to db.kassu file
-    fs.writeFileSync("db.kassu", JSON.stringify(todos));
+    save(req.headers.user, todos);
   } catch (e) {
     res.status(400).json({ message: e.message });
     return;
