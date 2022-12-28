@@ -1,0 +1,29 @@
+{
+  "name": "todo-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kassOmega/todo-server.git"
+  },
+  "keywords": [
+    "todo",
+    "server",
+    "todo-server"
+  ],
+  "author": "Kassahun Takele",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kassOmega/todo-server/issues"
+  },
+  "homepage": "https://github.com/kassOmega/todo-server#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.20"
+  }
+}
